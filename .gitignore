@@ -1,0 +1,7 @@
+*.pyc
+.ropeproject
+build/
+dist/
+django-warnings.egg-info/
+docs/_build/
+.venv/
