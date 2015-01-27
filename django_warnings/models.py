@@ -29,6 +29,9 @@ class Warning(models.Model):
 
     @property
     def automatically_acknowledged(self):
+        """
+        Determine whether or not the Warning was acknowledged by a user
+        """
         if self.last_acknowledged is None:
             return None
         return self.last_acknowledger is None
