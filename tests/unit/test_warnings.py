@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 from django.test import TestCase
+from django.utils import timezone
 
 from rest_framework import serializers
 
@@ -70,7 +71,7 @@ class WarningsMixinTest(TestCase):
         warning = Warning.objects.all()[0]
         self.assertIsNotNone(warning.first_generated)
         self.assertEqual(warning.last_generated - warning.first_generated,
-                         timedelta(microseconds=0))
+                         timedelta())
 
     def test_repeated_warnings_ocurrences(self):
         """
@@ -78,15 +79,17 @@ class WarningsMixinTest(TestCase):
         """
         warning_model = TestWarningsModel.objects.create()
 
+        before = timezone.now()
         warning_model.warnings
         warning_model.warnings
+        after = timezone.now()
 
         self.assertEqual(Warning.objects.count(), 1)
         warning = Warning.objects.all()[0]
         self.assertIsNotNone(warning.first_generated)
-        self.assertTrue(timedelta(microseconds=0) <
+        self.assertTrue(timedelta() <
                         warning.last_generated - warning.first_generated <
-                        timedelta(seconds=0.5))
+                        after - before)
 
     def test_stored_warning_references_the_object_that_generated_it(self):
         """
