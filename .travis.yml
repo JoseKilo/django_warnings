@@ -7,6 +7,6 @@ install:
   - "pip install coveralls"
   - "pip install -r test-requirements.txt"
 
-after_success: coveralls
+script: coverage run ./runtests.py
 
-script: ./runtests.py
+after_success: coveralls
