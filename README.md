@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/rockabox/django_warnings.svg?branch=master)](https://travis-ci.org/rockabox/django_warnings)
+[![Coverage](http://img.shields.io/coveralls/rockabox/django_warnings/master.svg)](https://coveralls.io/r/rockabox/django_warnings?branch=master)
 
 # django_warnings
 A package that gives you dynamic warnings with your django models
