@@ -6,10 +6,15 @@ from django.utils import timezone
 
 class Warning(models.Model):
     """
-    Warnings are persistent notifications of issues requiring attention
+    Warnings are persistent notifications of issues requiring attention.
 
-    They are connected to one or more of campaigns, line items, ad units,
-    creatives.
+    They are connected to one or more of instances of one or more models.
+    They contain a `subject` referencing the model and method that generated
+    them, as well as timestamps of the first and last generation time.
+
+    Warnings can also be acknowledged by a user or an automatic process. We
+    keep an id of the user that caused the Warning to be registered (if any)
+    and the last timestamp when that happened.
     """
 
     content_type = models.ForeignKey(ContentType)
@@ -23,7 +28,7 @@ class Warning(models.Model):
     last_generated = models.DateTimeField()
 
     acknowledged = models.BooleanField(default=False)
-    # Soft-FK to accounts.User
+    # Soft-FK to a model representing the User that acknowledges the Warning
     last_acknowledger = models.PositiveIntegerField(null=True, default=None)
     last_acknowledged = models.DateTimeField(null=True, default=None)
 
