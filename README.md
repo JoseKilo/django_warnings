@@ -27,7 +27,7 @@ Then you can access a `warnings` property on every instance of your model.
 
     >> test_model = TestModel()
     >> test_model.warnings
-    'Warning, 1 is not equal to 2'
+    ['Warning, 1 is not equal to 2']
 
 Keep in mind that your model `warning_methods` will be called each time you use
 the `warnings` property.
