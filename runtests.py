@@ -2,7 +2,12 @@
 
 import os
 import sys
+
+import django
 from django.conf import settings
+
+from tests import runtests
+
 
 DIRNAME = os.path.dirname(__file__)
 
@@ -36,25 +41,17 @@ settings.configure(
 )
 
 
-# for Django 1.7
-import django
-try:
-    django.setup()
-except AttributeError:
-    pass
+if __name__ == '__main__':
+    try:
+        # for Django 1.7
+        django.setup()
+    except AttributeError:
+        pass
 
+    failures = runtests.flake8()
+    if failures > 0:
+        sys.exit(1)
 
-from flake8.engine import get_style_guide
-from flake8.main import DEFAULT_CONFIG, print_report
-from django_nose.runner import NoseTestSuiteRunner
-
-flake8_style = get_style_guide(parse_argv=True, config_file=DEFAULT_CONFIG)
-report = flake8_style.check_files()
-if report.total_errors > 0:
-    print_report(report, flake8_style)
-    sys.exit(1)
-
-test_runner = NoseTestSuiteRunner(verbosity=1)
-failures = test_runner.run_tests(['tests'])
-if failures > 0:
-    sys.exit(1)
+    failures = runtests.nose()
+    if failures > 0:
+        sys.exit(1)
