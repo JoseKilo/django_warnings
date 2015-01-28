@@ -41,10 +41,10 @@ class WarningsMixinTest(TestCase):
         warning_model = TestWarningsModel.objects.create()
 
         warnings = warning_model.warnings
+        stored_warning = Warning.objects.all()[0]
 
         self.assertEqual(len(warnings), 1)
         self.assertEqual(Warning.objects.count(), 1)
-        stored_warning = Warning.objects.all()[0]
         self.assertEqual(stored_warning.message, warnings[0])
 
     def test_stored_warning_contains_subject(self):
@@ -54,9 +54,9 @@ class WarningsMixinTest(TestCase):
         warning_model = TestWarningsModel.objects.create()
 
         warning_model.warnings
+        warning = Warning.objects.all()[0]
 
         self.assertEqual(Warning.objects.count(), 1)
-        warning = Warning.objects.all()[0]
         self.assertEqual(warning.subject, 'tests.models.some_warnings_method')
 
     def test_stored_warning_contains_first_and_last_generated_dates(self):
@@ -66,9 +66,9 @@ class WarningsMixinTest(TestCase):
         warning_model = TestWarningsModel.objects.create()
 
         warning_model.warnings
+        warning = Warning.objects.all()[0]
 
         self.assertEqual(Warning.objects.count(), 1)
-        warning = Warning.objects.all()[0]
         self.assertIsNotNone(warning.first_generated)
         self.assertEqual(warning.last_generated - warning.first_generated,
                          timedelta())
@@ -83,9 +83,9 @@ class WarningsMixinTest(TestCase):
         warning_model.warnings
         warning_model.warnings
         after = timezone.now()
+        warning = Warning.objects.all()[0]
 
         self.assertEqual(Warning.objects.count(), 1)
-        warning = Warning.objects.all()[0]
         self.assertIsNotNone(warning.first_generated)
         self.assertTrue(timedelta() <
                         warning.last_generated - warning.first_generated <
@@ -98,10 +98,10 @@ class WarningsMixinTest(TestCase):
         warning_model = TestWarningsModel.objects.create()
 
         warning_model.warnings
-
-        self.assertEqual(Warning.objects.count(), 1)
         warning = Warning.objects.all()[0]
         original_object = warning.content_object
+
+        self.assertEqual(Warning.objects.count(), 1)
         self.assertEqual(original_object, warning_model)
 
     def test_stored_warning_is_unacknowledged_by_default(self):
@@ -111,9 +111,9 @@ class WarningsMixinTest(TestCase):
         warning_model = TestWarningsModel.objects.create()
 
         warning_model.warnings
+        warning = Warning.objects.all()[0]
 
         self.assertEqual(Warning.objects.count(), 1)
-        warning = Warning.objects.all()[0]
         self.assertFalse(warning.acknowledged)
         self.assertIsNone(warning.automatically_acknowledged)
         self.assertIsNone(warning.last_acknowledger)
@@ -126,11 +126,11 @@ class WarningsMixinTest(TestCase):
         user_id = 3
         warning_model = TestWarningsModel.objects.create()
         warning_model.warnings
-        self.assertEqual(Warning.objects.count(), 1)
         warning = Warning.objects.all()[0]
 
         warning.acknowledge(user_id)
 
+        self.assertEqual(Warning.objects.count(), 1)
         self.assertTrue(warning.acknowledged)
         self.assertFalse(warning.automatically_acknowledged)
         self.assertEqual(warning.last_acknowledger, user_id)
@@ -142,11 +142,11 @@ class WarningsMixinTest(TestCase):
         """
         warning_model = TestWarningsModel.objects.create()
         warning_model.warnings
-        self.assertEqual(Warning.objects.count(), 1)
         warning = Warning.objects.all()[0]
 
         warning.acknowledge()
 
+        self.assertEqual(Warning.objects.count(), 1)
         self.assertTrue(warning.acknowledged)
         self.assertTrue(warning.automatically_acknowledged)
         self.assertIsNone(warning.last_acknowledger)
