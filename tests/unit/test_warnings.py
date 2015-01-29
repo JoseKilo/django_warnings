@@ -3,42 +3,28 @@ from datetime import timedelta
 from django.test import TestCase
 from django.utils import timezone
 
-from rest_framework import serializers
-
 from django_warnings.models import Warning
-from ..models import TestWarningsModel
-
-
-class TestSerializer(serializers.ModelSerializer):
-
-    warnings = serializers.Field()
-
-    class Meta:
-        model = TestWarningsModel
-        fields = ('name', 'warnings',)
+from ..models import WarningsGeneratingModel
 
 
 class WarningsMixinTest(TestCase):
 
     def test_warnings_property_contains_warnings(self):
-        warning_model = TestWarningsModel.objects.create()
+        """
+        Make a model generate a Warning and check the result
+        """
+        warning_model = WarningsGeneratingModel.objects.create()
 
         self.assertTrue(hasattr(warning_model, 'warnings'))
         self.assertTrue(
             warning_model.warning_message in warning_model.warnings
         )
 
-    def test_serializer_returns_warnings(self):
-        warning_model = TestWarningsModel.objects.create()
-        data = TestSerializer(warning_model).data
-
-        self.assertEqual(data['warnings'][0], warning_model.warning_message)
-
     def test_warnings_are_stored_into_database(self):
         """
         Instantiate a model reporting warnings, it generates a Warning object
         """
-        warning_model = TestWarningsModel.objects.create()
+        warning_model = WarningsGeneratingModel.objects.create()
 
         warnings = warning_model.warnings
         stored_warning = Warning.objects.all()[0]
@@ -51,7 +37,7 @@ class WarningsMixinTest(TestCase):
         """
         Any stored Warning references the class and method that generated it
         """
-        warning_model = TestWarningsModel.objects.create()
+        warning_model = WarningsGeneratingModel.objects.create()
 
         warning_model.warnings
         warning = Warning.objects.all()[0]
@@ -63,7 +49,7 @@ class WarningsMixinTest(TestCase):
         """
         Any stored Warning references its first and last occurrence
         """
-        warning_model = TestWarningsModel.objects.create()
+        warning_model = WarningsGeneratingModel.objects.create()
 
         warning_model.warnings
         warning = Warning.objects.all()[0]
@@ -77,7 +63,7 @@ class WarningsMixinTest(TestCase):
         """
         New occurrences increase the `last_generated` field
         """
-        warning_model = TestWarningsModel.objects.create()
+        warning_model = WarningsGeneratingModel.objects.create()
 
         before = timezone.now()
         warning_model.warnings
@@ -95,7 +81,7 @@ class WarningsMixinTest(TestCase):
         """
         Any stored Warning allows to retrieve the original object causing it
         """
-        warning_model = TestWarningsModel.objects.create()
+        warning_model = WarningsGeneratingModel.objects.create()
 
         warning_model.warnings
         warning = Warning.objects.all()[0]
@@ -108,7 +94,7 @@ class WarningsMixinTest(TestCase):
         """
         Any stored Warning is not acknowledged when first generated
         """
-        warning_model = TestWarningsModel.objects.create()
+        warning_model = WarningsGeneratingModel.objects.create()
 
         warning_model.warnings
         warning = Warning.objects.all()[0]
@@ -124,7 +110,7 @@ class WarningsMixinTest(TestCase):
         A Warning can be acknowledged, then it gets related fields filled
         """
         user_id = 3
-        warning_model = TestWarningsModel.objects.create()
+        warning_model = WarningsGeneratingModel.objects.create()
         warning_model.warnings
         warning = Warning.objects.all()[0]
 
@@ -140,7 +126,7 @@ class WarningsMixinTest(TestCase):
         """
         A Warning is acknowledged automatically by not specifying a `user_id`
         """
-        warning_model = TestWarningsModel.objects.create()
+        warning_model = WarningsGeneratingModel.objects.create()
         warning_model.warnings
         warning = Warning.objects.all()[0]
 
