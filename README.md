@@ -5,6 +5,8 @@
 A package that gives you dynamic warnings with your django models
 
 ## How-to use
+First of all, you need to `django_warnings` to your `INSTALLED_APPS`.
+
 In order to generate Warnings from a Model, you need to add a Mixin to it and
 to reference which methods will be used to actually produce Warnings.
 

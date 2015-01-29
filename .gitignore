@@ -6,3 +6,4 @@ dist/
 django-warnings.egg-info/
 docs/_build/
 .venv/
+django_warnings.egg-info/
