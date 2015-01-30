@@ -21,11 +21,11 @@ class WarningsSerializerTest(TestCase):
         """
         Serialize a model with Warnings associated to it
         """
-        warning_model = WarningsGeneratingModel.objects.create()
-        data = WarningsGeneratingSerializer(warning_model).data
+        warning_object = WarningsGeneratingModel.objects.create()
+        data = WarningsGeneratingSerializer(warning_object).data
 
         self.assertEqual(data['warnings'][0]['message'],
-                         warning_model.warning_message)
+                         warning_object.warning_message)
 
     def test_serialize_queryset_returns_warnings(self):
         """
@@ -35,8 +35,8 @@ class WarningsSerializerTest(TestCase):
         for _ in xrange(number_of_instances):
             WarningsGeneratingModel.objects.create()
 
-        warning_models = WarningsGeneratingModel.objects.all()
-        data = WarningsGeneratingSerializer(warning_models, many=True).data
+        warning_objects = WarningsGeneratingModel.objects.all()
+        data = WarningsGeneratingSerializer(warning_objects, many=True).data
 
         self.assertEqual(len(data), number_of_instances)
         for element in data:
@@ -54,8 +54,8 @@ class WarningsSerializerTest(TestCase):
                 model = WarningsGeneratingModel
                 fields = ('name', 'warnings',)
 
-        warning_model = WarningsGeneratingModel.objects.create()
-        data = SubjectSerializer(warning_model).data
+        warning_object = WarningsGeneratingModel.objects.create()
+        data = SubjectSerializer(warning_object).data
         warnings = data['warnings']
 
         self.assertEqual(len(warnings), 1)
@@ -78,10 +78,10 @@ class WarningsSerializerTest(TestCase):
                 model = WarningsGeneratingModel
                 fields = ('name', 'warnings',)
 
-        warning_model = WarningsGeneratingModel.objects.create()
-        data = FullSerializer(warning_model).data
+        warning_object = WarningsGeneratingModel.objects.create()
+        data = FullSerializer(warning_object).data
         warnings = data['warnings']
 
         self.assertEqual(len(warnings), 1)
         self.assertEqual(set(warnings[0].keys()), set(all_fields))
-        self.assertEqual(warnings[0]['object_id'], warning_model.id)
+        self.assertEqual(warnings[0]['object_id'], warning_object.id)
