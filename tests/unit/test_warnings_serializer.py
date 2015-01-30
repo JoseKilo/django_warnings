@@ -83,5 +83,5 @@ class WarningsSerializerTest(TestCase):
         warnings = data['warnings']
 
         self.assertEqual(len(warnings), 1)
-        self.assertEqual(set(warnings[0].keys()), set(all_fields))
+        self.assertEqual(sorted(warnings[0].keys()), sorted(all_fields))
         self.assertEqual(warnings[0]['object_id'], warning_object.id)
