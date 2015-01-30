@@ -3,7 +3,7 @@ from django.db import models
 from django_warnings.mixins import WarningsMixin
 
 
-class TestWarningsModel(WarningsMixin, models.Model):
+class WarningsGeneratingModel(WarningsMixin, models.Model):
     """
     A Model for testing the warnings system
     """
