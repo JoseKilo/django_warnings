@@ -33,3 +33,33 @@ Then you can access a `warnings` property on every instance of your model.
 
 Keep in mind that your model `warning_methods` will be called each time you use
 the `warnings` property.
+
+## Django-rest-framework compatible API
+You can access a REST API to the Warnings backend by just including a line into
+your `urls.py`::
+
+    urlpatterns = patterns(
+        '',
+        ...
+        url(r'^warnings/',
+            include('django_warnings.urls', namespace='warnings')),
+        ...
+    )
+
+This will add an endpoint to acknowledge a Warning and to retrive information
+from the Warnings stored in your database. You can do::
+
+    GET  .../warnings/warning/                   Will return every stored Warning
+    GET  .../warnings/warning/{id}               Will return an specific Warning
+    POST .../warnings/warning/{id}/acknowledge   Will acknowledge a Warning
+
+As part of the last POST call body you can specify a `user_id`, identifying the
+user that is acknowledging the Warning.
+
+The default behavior will be to return 'id' and 'message' for every Warnings
+object. If you want to return different fields, you can extend the ViewSet::
+
+    from django_warnings.views import WarningViewSet
+
+    class MyWarningViewSet(WarningViewSet):
+        serializer_fields = ('message', 'last_generated')
