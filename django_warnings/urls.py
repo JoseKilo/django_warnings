@@ -6,7 +6,7 @@ from .views import WarningViewSet
 
 
 router = routers.SimpleRouter()
-router.register(r'users', WarningViewSet)
+router.register(r'warning', WarningViewSet)
 
 urlpatterns = patterns(
     '',
