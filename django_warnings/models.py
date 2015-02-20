@@ -23,9 +23,8 @@ class Warning(models.Model):
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
-    identifier = models.CharField(
-        max_length=50, choices=getattr(settings, 'warning_codes', []),
-        blank=True, null=True
+    identifier = models.TextField(
+        choices=getattr(settings, 'warning_codes', []), blank=True, null=True
     )
     url_params = JSONField(
         help_text='An object with keys that help the frontend form a url',

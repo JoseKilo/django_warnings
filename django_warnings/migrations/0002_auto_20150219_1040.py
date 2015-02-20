@@ -12,10 +12,14 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.AlterModelOptions(
+            name='warning',
+            options={'ordering': ('last_generated',)},
+        ),
         migrations.AddField(
             model_name='warning',
             name='identifier',
-            field=models.CharField(max_length=50, null=True, blank=True),
+            field=models.TextField(null=True, blank=True),
             preserve_default=True,
         ),
         migrations.AddField(

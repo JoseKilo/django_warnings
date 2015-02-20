@@ -74,3 +74,6 @@ object. If you want to return different fields, you can extend the ViewSet::
 
     class MyWarningViewSet(WarningViewSet):
         serializer_fields = ('message', 'last_generated')
+
+Also worth noting:
+The default ordering of warnings is by `last_generated`
