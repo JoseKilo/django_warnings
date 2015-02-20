@@ -7,7 +7,7 @@ except ImportError:
 
 setup(
     name='django-warnings',
-    version='1.0.1',
+    version='1.1.1',
     author='rockabox',
     author_email='tech@rockabox.com',
     packages=['django_warnings'],
