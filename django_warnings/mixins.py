@@ -1,43 +1,71 @@
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
+from django.db.models import Q, F
 
 from .models import Warning
 
 
 class WarningsMixin(object):
     """
-    A Mixin to add a `warnings` property to models
+    A Mixin to add warning methods/properties to models
 
-    The model should have a class level property called `warning_methods` that
-    contains names of the methods that are to be called. Every one of these
-    methods should return a list of warning messages
+    The model you mixin in to should decorate warning methods with the
+    `register_warning` decorator, to generate the warning, simple return your
+    warning message from the method, or an iterable of emssages for multiple
+    warnings
     """
 
-    warning_methods = []
+    def generate_warning(self, message, method=None, identifier=None,
+                         url_params=None):
+        """
+        Given a message and an optional error_code, generate a warning
+        """
+        params = {
+            'message': message,
+            'content_type': ContentType.objects.get_for_model(self),
+            'object_id': self.id,
+        }
+
+        if method:
+            params.update({'subject': method})
+
+        if identifier:
+            params.update({'identifier': identifier})
+
+        # Fetch the warning before adding the url_params, because once we add
+        # a JSONField into the mix, django orm's filter does not work
+        warning = Warning.objects.filter(**params)
+
+        if url_params:
+            params.update({'url_params': url_params})
+
+        if not warning.exists():
+            warning = Warning.objects.create(
+                last_generated=timezone.now(), **params
+            )
+        else:
+            warning.update(last_generated=timezone.now(), **params)
+
+        return warning
+
+    def generate_warnings(self):
+        """
+        This method will be called by the serialiser field, it picks up any
+        methods defined in your models warning_methods and calls them
+        """
+        for method in self.__class__.__dict__:
+            if hasattr(getattr(self.__class__, method), 'is_warning'):
+                getattr(self, method)()
 
     @property
     def warnings(self):
         """
-        The model property that contains the aggregated warnings
+        Return all warnings associated with this model that have not yet been
+        acknowledged, or have been generated again since acknowledgement
         """
-        warnings = []
-        for method in self.warning_methods:
-            callable_method = getattr(self, method)
-            outcome = callable_method()
-
-            for message in outcome:
-                warning, _ = Warning.objects.update_or_create(
-                    subject='{}.{}'.format(self.__class__.__module__, method),
-                    message=message,
-                    content_type=ContentType.objects.get_for_model(self),
-                    object_id=self.id,
-                    defaults={
-                        'last_generated': timezone.now()
-                    }
-                )
-
-                if (warning.last_acknowledged is None or
-                        warning.last_acknowledged < warning.last_generated):
-                    warnings.append(message)
-
-        return warnings
+        return Warning.objects.filter(
+            Q(content_type=ContentType.objects.get_for_model(self)),
+            Q(object_id=self.id),
+            Q(last_acknowledged=None) |
+            Q(last_acknowledged__lt=F('last_generated')),
+        )

@@ -8,30 +8,29 @@ A package that gives you dynamic warnings with your django models
 First of all, you need to `django_warnings` to your `INSTALLED_APPS`.
 
 In order to generate Warnings from a Model, you need to add a Mixin to it and
-to reference which methods will be used to actually produce Warnings.
+to decorate the methods that will be used to actually produce Warnings.
+
+    from django_warnings.mixins import WarningsMixin
+    from django_warnings.decorators import register_warning
+    from django_warnings.warnings import DjangoWarning
+
 
     class TestModel(WarningsMixin, models.Model):
 
         name = models.TextField()
 
-        warning_methods = ['some_warnings_method']
-
-        # Used for easier assertion
-        warning_message = 'Warning, 1 is not equal to 2'
-
-        def some_warnings_method(self):
-            warnings = []
+        @register_warning
+        def some_warning_method(self):
             if 1 != 2:
-                warnings.append(self.warning_message)
-            return warnings
+                raise DjangoWarning('Warning 1 is not equal to 2')
 
 Then you can access a `warnings` property on every instance of your model.
 
     >> test_model = TestModel()
-    >> test_model.warnings
-    ['Warning, 1 is not equal to 2']
+    >> test_model.warnings.all()
+    [<'Warning: Warning, 1 is not equal to 2'>]
 
-Keep in mind that your model `warning_methods` will be called each time you use
+Keep in mind that your models warning methods will be called each time you use
 the `warnings` property.
 
 ## Django-rest-framework compatible API
@@ -63,3 +62,38 @@ object. If you want to return different fields, you can extend the ViewSet::
 
     class MyWarningViewSet(WarningViewSet):
         serializer_fields = ('message', 'last_generated')
+
+## Consuming warnings on the frontend (optional)
+
+When you make an warning . i.e-
+
+    instance = Model()
+    instance.generate_warning('Something weird here', identifier='SOMECODE', url_params={
+        'object_id': 234,
+        'arbitrary_param': 'arbitrary_value'
+    }])
+
+Then when you receive the warning back from the API, it will look something like*:
+
+    {
+        'id': 1,
+        'message': 'Something weird is going on',
+        'identifier': 'SOMECODE',
+        'url_params': {
+            'object_id': 234,
+            'arbitrary_param': 'arbitrary_value'
+        }
+    }
+
+    Then your frontend could construct a resolution message, such as:
+
+    error_resolutions = {
+        'SOMECODE': '{arbitrary_param} is not a valid thing, go to http://yourapp.com/{object_id} to fix it'
+    }
+
+    Using the identifier and url params to help construct this message
+
+* subject to having defined these parameters in the `fields` attribute mentioned above
+
+## Also worth noting:
+The default ordering of warnings is by `last_generated`

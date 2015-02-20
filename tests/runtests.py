@@ -13,5 +13,5 @@ def flake8():
 def nose():
     from django_nose.runner import NoseTestSuiteRunner
     test_runner = NoseTestSuiteRunner(verbosity=1)
-    failures = test_runner.run_tests(['-s', 'tests'])
+    failures = test_runner.run_tests(['-s', 'tests', '--with-yanc'])
     return failures

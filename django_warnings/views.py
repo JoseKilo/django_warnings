@@ -18,7 +18,7 @@ class WarningViewSet(ReadOnlyModelViewSet):
 
     model = Warning
     serializer_class = WarningModelSerializer
-    serializer_fields = ('id', 'message',)
+    serializer_fields = ('id', 'message', 'identifier', 'url_params')
     http_method_names = ('get', 'post')
 
     def get_serializer(self, instance=None, data=None, files=None, many=False,

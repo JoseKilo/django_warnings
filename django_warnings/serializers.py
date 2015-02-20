@@ -1,5 +1,3 @@
-from django.contrib.contenttypes.models import ContentType
-
 from rest_framework import serializers
 
 from .models import Warning
@@ -25,17 +23,11 @@ class WarningSerializer(serializers.Serializer):
         super(WarningSerializer, self).__init__(*args, **kwargs)
 
     def to_native(self, obj):
+        if hasattr(obj, 'generate_warnings'):
+            obj.generate_warnings()
 
-        # Trigger the Warnings generation
-        obj.warnings
-
-        # Fetch generated Warnings
-        warnings = Warning.objects.filter(
-            content_type=ContentType.objects.get_for_model(obj),
-            object_id=obj.id
-        )
         return WarningModelSerializer(
-            warnings, many=True, fields=self.warning_fields).data
+            obj.warnings.all(), many=True, fields=self.warning_fields).data
 
 
 class WarningModelSerializer(serializers.ModelSerializer):
@@ -48,8 +40,9 @@ class WarningModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Warning
         fields = ('id', 'content_type', 'object_id', 'subject', 'message',
-                  'first_generated', 'last_generated',
-                  'acknowledged', 'last_acknowledger', 'last_acknowledged')
+                  'first_generated', 'last_generated', 'identifier',
+                  'url_params', 'acknowledged', 'last_acknowledger',
+                  'last_acknowledged')
 
     def __init__(self, *args, **kwargs):
         fields = kwargs.pop('fields', [])
@@ -60,5 +53,6 @@ class WarningModelSerializer(serializers.ModelSerializer):
         # Copied from an example on DRF documentation.
         allowed = set(fields)
         existing = set(self.fields.keys())
+
         for field_name in existing - allowed:
             self.fields.pop(field_name)
