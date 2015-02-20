@@ -75,5 +75,43 @@ object. If you want to return different fields, you can extend the ViewSet::
     class MyWarningViewSet(WarningViewSet):
         serializer_fields = ('message', 'last_generated')
 
-Also worth noting:
+## Consuming warnings on the frontend (optional)
+
+In your settings.py set the possible warning codes
+
+    WARNING_CODES = (
+        ('SOMECODE', 'Some Code Label',)
+    )
+
+when you make an warning . i.e-
+
+    instance = Model()
+    instance.generate_warning('Something weird here', identifier='SOMECODE', url_params={
+        'object_id': 234,
+        'arbitrary_param': 'arbitrary_value'
+    }])
+
+Then when you receive the warning back from the API, it will look something like*:
+
+    {
+        'id': 1,
+        'message': 'Something weird is going on',
+        'identifier': 'SOMECODE',
+        'url_params': {
+            'object_id': 234,
+            'arbitrary_param': 'arbitrary_value'
+        }
+    }
+
+    Then your frontend could construct a resolution message, such as:
+
+    error_resolutions = {
+        'SOMECODE': '{arbitrary_param} is not a valid thing, go to http://yourapp.com/{object_id} to fix it'
+    }
+
+    Using the identifier and url params to help construct this message
+
+* subject to having defined these parameters in the `fields` attribute mentioned above
+
+## Also worth noting:
 The default ordering of warnings is by `last_generated`
