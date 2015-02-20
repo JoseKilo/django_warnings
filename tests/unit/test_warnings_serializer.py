@@ -60,7 +60,7 @@ class WarningsSerializerTest(TestCase):
 
         self.assertEqual(len(warnings), 1)
         self.assertListEqual(warnings[0].keys(), ['subject'])
-        self.assertEqual(warnings[0]['subject'], 'some_single_warning_method')
+        self.assertEqual(warnings[0]['subject'], 'some_warning_method')
 
     def test_serializer_can_contain_every_field(self):
         """

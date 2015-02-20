@@ -3,12 +3,29 @@ from datetime import timedelta
 from django.test import TestCase
 from django.utils import timezone
 
-from ..models import WarningsGeneratingModel, MultiWarningsGeneratingModel
+from django_warnings.models import Warning
+
+from ..models import WarningsGeneratingModel
 
 
 class WarningsMixinTest(TestCase):
 
     maxDiff = None
+
+    def test_warnings_model(self):
+        """
+        Ensure a model represents itself properly
+        """
+        warning_object = WarningsGeneratingModel.objects.create()
+        test_subject = 'Something'
+
+        warning = Warning.objects.create(
+            content_object=warning_object,
+            subject=test_subject,
+            last_generated=timezone.now()
+        )
+
+        self.assertTrue(test_subject in str(warning))
 
     def test_warnings_property_contains_warnings(self):
         """
@@ -46,7 +63,7 @@ class WarningsMixinTest(TestCase):
         warning = warning_object.warnings.all().get()
 
         self.assertEqual(warning_object.warnings.count(), 1)
-        self.assertEqual(warning.subject, 'some_single_warning_method')
+        self.assertEqual(warning.subject, 'some_warning_method')
 
     def test_stored_warning_contains_first_and_last_generated_dates(self):
         """
@@ -141,17 +158,3 @@ class WarningsMixinTest(TestCase):
         self.assertTrue(warning.automatically_acknowledged)
         self.assertIsNone(warning.last_acknowledger)
         self.assertIsNotNone(warning.last_acknowledged)
-
-    def test_multi_warnings_generation(self):
-        """
-        We can generate multiple warnings with one method, also test
-        idemptotence
-        """
-        warning_object = MultiWarningsGeneratingModel.objects.create()
-
-        warning_object.generate_warnings()
-
-        # Run again for fun
-        warning_object.generate_warnings()
-
-        self.assertEqual(warning_object.warnings.count(), 2)

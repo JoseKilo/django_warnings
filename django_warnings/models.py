@@ -1,6 +1,5 @@
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
@@ -23,9 +22,7 @@ class Warning(models.Model):
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
-    identifier = models.TextField(
-        choices=getattr(settings, 'WARNING_CODES', []), blank=True, null=True
-    )
+    identifier = models.TextField(blank=True, null=True)
     url_params = JSONField(
         help_text='An object with keys that help the frontend form a url',
         blank=True, null=True

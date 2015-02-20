@@ -49,8 +49,8 @@ class WarningsEndpointTest(TestCase):
         We do not create duplicate warnings
         """
         generating_object = WarningsGeneratingModel.objects.create()
-        generating_object.generate_warning('Fuck Something is broken')
-        generating_object.generate_warning('Fuck Something is broken')
+        generating_object.generate_warning('Im in a pickle')
+        generating_object.generate_warning('Im in a pickle')
 
         self.assertTrue(generating_object.warnings.count(), 1)
 

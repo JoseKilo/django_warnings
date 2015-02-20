@@ -32,12 +32,19 @@ class WarningsMixin(object):
         if identifier:
             params.update({'identifier': identifier})
 
+        # Fetch the warning before adding the url_params, because once we add
+        # a JSONField into the mix, django orm's filter does not work
+        warning = Warning.objects.filter(**params)
+
         if url_params:
             params.update({'url_params': url_params})
 
-        warning, created = Warning.objects.update_or_create(
-            defaults={'last_generated': timezone.now()}, **params
-        )
+        if not warning.exists():
+            warning = Warning.objects.create(
+                last_generated=timezone.now(), **params
+            )
+        else:
+            warning.update(last_generated=timezone.now(), **params)
 
         return warning
 

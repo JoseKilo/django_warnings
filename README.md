@@ -12,6 +12,7 @@ to decorate the methods that will be used to actually produce Warnings.
 
     from django_warnings.mixins import WarningsMixin
     from django_warnings.decorators import register_warning
+    from django_warnings.warnings import DjangoWarning
 
 
     class TestModel(WarningsMixin, models.Model):
@@ -19,28 +20,15 @@ to decorate the methods that will be used to actually produce Warnings.
         name = models.TextField()
 
         @register_warning
-        def some_multi_warning_method(self):
-            warnings = []
-
+        def some_warning_method(self):
             if 1 != 2:
-                warnings.append('Warning 1 is not equal to 2')
-
-            if 2 != 3:
-                warnings.append('Warning 2 is not equal to 3')
-
-            return warnings
-
-        @register_warning
-        def some_multi_warning_method(self):
-            warnings = []
-            if 1 != 2:
-                return 'Warning 1 is not equal to 2'
+                raise DjangoWarning('Warning 1 is not equal to 2')
 
 Then you can access a `warnings` property on every instance of your model.
 
     >> test_model = TestModel()
     >> test_model.warnings.all()
-    ['Warning, 1 is not equal to 2']
+    [<'Warning: Warning, 1 is not equal to 2'>]
 
 Keep in mind that your models warning methods will be called each time you use
 the `warnings` property.
@@ -77,13 +65,7 @@ object. If you want to return different fields, you can extend the ViewSet::
 
 ## Consuming warnings on the frontend (optional)
 
-In your settings.py set the possible warning codes
-
-    WARNING_CODES = (
-        ('SOMECODE', 'Some Code Label',)
-    )
-
-when you make an warning . i.e-
+When you make an warning . i.e-
 
     instance = Model()
     instance.generate_warning('Something weird here', identifier='SOMECODE', url_params={

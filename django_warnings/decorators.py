@@ -1,10 +1,12 @@
 from functools import partial
 
+from .warnings import DjangoWarning
+
 
 class register_warning(object):
     """
-    A Decorator for model methods, When used it generates a warning for the
-    output that the method returns
+    A Decorator for model methods, When used it catches Warnings raised by
+    the method its wrapping, its geared to work with an instance
     """
 
     def __init__(self, func):
@@ -26,16 +28,20 @@ class register_warning(object):
 
     def __call__(self, obj, *args, **kwargs):
         """
-        When called, if a result is returned (either a string, or an iterable
-        of strings), generate a warning for it
+        If the function raises a DjangoWarning, generate a warning
+        instance for it
         """
-        result = self.func(obj, *args, **kwargs)
 
-        if result:
-            if hasattr(result, '__iter__'):
-                for message in result:
-                    obj.generate_warning(message, method=self.func.func_name)
-            else:
-                obj.generate_warning(result, method=self.func.func_name)
+        result = None
+
+        try:
+            result = self.func(obj, *args, **kwargs)
+        except DjangoWarning as warning:
+            obj.generate_warning(
+                warning.message,
+                method=self.func.func_name,
+                identifier=warning.identifier,
+                url_params=warning.url_params
+            )
 
         return result
