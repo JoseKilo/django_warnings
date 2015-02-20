@@ -10,7 +10,6 @@ from tests import runtests
 
 
 DIRNAME = os.path.dirname(__file__)
-
 settings.configure(
     DATABASES={
         'default': {

@@ -60,16 +60,16 @@ class WarningsSerializerTest(TestCase):
 
         self.assertEqual(len(warnings), 1)
         self.assertListEqual(warnings[0].keys(), ['subject'])
-        self.assertEqual(warnings[0]['subject'],
-                         'tests.models.some_warnings_method')
+        self.assertEqual(warnings[0]['subject'], 'some_single_warning_method')
 
     def test_serializer_can_contain_every_field(self):
         """
         Use a serializer returning the every field on the Warning object
         """
         all_fields = ('id', 'content_type', 'object_id', 'subject', 'message',
-                      'first_generated', 'last_generated',
-                      'acknowledged', 'last_acknowledger', 'last_acknowledged')
+                      'first_generated', 'last_generated', 'identifier',
+                      'url_params', 'acknowledged', 'last_acknowledger',
+                      'last_acknowledged')
 
         class FullSerializer(serializers.ModelSerializer):
             warnings = WarningSerializer(fields=all_fields)

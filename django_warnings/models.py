@@ -1,7 +1,10 @@
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.conf import settings
 from django.db import models
 from django.utils import timezone
+
+from json_field import JSONField
 
 
 class Warning(models.Model):
@@ -20,6 +23,14 @@ class Warning(models.Model):
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
+    identifier = models.CharField(
+        max_length=50, choices=getattr(settings, 'warning_codes', []),
+        blank=True, null=True
+    )
+    url_params = JSONField(
+        help_text='An object with keys that help the frontend form a url',
+        blank=True, null=True
+    )
 
     subject = models.TextField()
     message = models.TextField()
@@ -31,6 +42,12 @@ class Warning(models.Model):
     # Soft-FK to a model representing the User that acknowledges the Warning
     last_acknowledger = models.PositiveIntegerField(null=True, default=None)
     last_acknowledged = models.DateTimeField(null=True, default=None)
+
+    class Meta:
+        ordering = ('last_generated',)
+
+    def __str__(self):
+        return self.subject
 
     @property
     def automatically_acknowledged(self):

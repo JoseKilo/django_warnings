@@ -34,7 +34,7 @@ class WarningsEndpointTest(TestCase):
         number_of_objects = 10
         for _ in xrange(number_of_objects):
             generating_object = WarningsGeneratingModel.objects.create()
-            generating_object.warnings
+            generating_object.generate_warnings()
         url = reverse('warnings:warning-list')
 
         response = self.client.get(url)
@@ -44,19 +44,28 @@ class WarningsEndpointTest(TestCase):
         self.assertIn('id', response.data[0])
         self.assertIn('message', response.data[0])
 
+    def test_no_duplicate_warnings(self):
+        """
+        We do not create duplicate warnings
+        """
+        generating_object = WarningsGeneratingModel.objects.create()
+        generating_object.generate_warning('Fuck Something is broken')
+        generating_object.generate_warning('Fuck Something is broken')
+
+        self.assertTrue(generating_object.warnings.count(), 1)
+
     def test_detail(self):
         """
         The detail endpoint response is valid for a given Warning
         """
         generating_object = WarningsGeneratingModel.objects.create()
-        generating_object.warnings
+        generating_object.generate_warnings()
         warning_object = Warning.objects.all()[0]
         url = reverse('warnings:warning-detail', args=(warning_object.id,))
 
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(sorted(response.data.keys()), ['id', 'message'])
         self.assertEqual(response.data['id'], warning_object.id)
         self.assertEqual(response.data['message'], warning_object.message)
 
@@ -65,7 +74,7 @@ class WarningsEndpointTest(TestCase):
         The acknowledge endpoint, actually acknowledges a given Warning
         """
         generating_object = WarningsGeneratingModel.objects.create()
-        generating_object.warnings
+        generating_object.generate_warnings()
         warning_object = Warning.objects.all()[0]
         url = reverse('warnings:warning-acknowledge',
                       args=(warning_object.id,))
@@ -73,7 +82,6 @@ class WarningsEndpointTest(TestCase):
         response = self.client.post(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(sorted(response.data.keys()), ['id', 'message'])
         self.assertEqual(response.data['id'], warning_object.id)
         self.assertEqual(response.data['message'], warning_object.message)
 
@@ -88,7 +96,7 @@ class WarningsEndpointTest(TestCase):
         The acknowledge endpoint receives and stores the acknowledger
         """
         generating_object = WarningsGeneratingModel.objects.create()
-        generating_object.warnings
+        generating_object.generate_warnings()
         warning_object = Warning.objects.all()[0]
         url = reverse('warnings:warning-acknowledge',
                       args=(warning_object.id,))
@@ -96,7 +104,6 @@ class WarningsEndpointTest(TestCase):
         response = self.client.post(url, data={'user_id': 42})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(sorted(response.data.keys()), ['id', 'message'])
         self.assertEqual(response.data['id'], warning_object.id)
         self.assertEqual(response.data['message'], warning_object.message)
 

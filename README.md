@@ -8,30 +8,41 @@ A package that gives you dynamic warnings with your django models
 First of all, you need to `django_warnings` to your `INSTALLED_APPS`.
 
 In order to generate Warnings from a Model, you need to add a Mixin to it and
-to reference which methods will be used to actually produce Warnings.
+to decorate the methods that will be used to actually produce Warnings.
+
+    from django_warnings.mixins import WarningsMixin
+    from django_warnings.decorators import register_warning
+
 
     class TestModel(WarningsMixin, models.Model):
 
         name = models.TextField()
 
-        warning_methods = ['some_warnings_method']
+        @register_warning
+        def some_multi_warning_method(self):
+            warnings = []
 
-        # Used for easier assertion
-        warning_message = 'Warning, 1 is not equal to 2'
+            if 1 != 2:
+                warnings.append('Warning 1 is not equal to 2')
 
-        def some_warnings_method(self):
+            if 2 != 3:
+                warnings.append('Warning 2 is not equal to 3')
+
+            return warnings
+
+        @register_warning
+        def some_multi_warning_method(self):
             warnings = []
             if 1 != 2:
-                warnings.append(self.warning_message)
-            return warnings
+                return 'Warning 1 is not equal to 2'
 
 Then you can access a `warnings` property on every instance of your model.
 
     >> test_model = TestModel()
-    >> test_model.warnings
+    >> test_model.warnings.all()
     ['Warning, 1 is not equal to 2']
 
-Keep in mind that your model `warning_methods` will be called each time you use
+Keep in mind that your models warning methods will be called each time you use
 the `warnings` property.
 
 ## Django-rest-framework compatible API
