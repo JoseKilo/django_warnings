@@ -10,7 +10,7 @@ setup(
     version='1.1.1',
     author='rockabox',
     author_email='tech@rockabox.com',
-    packages=['django_warnings'],
+    packages=['django_warnings', 'django_warnings.migrations'],
     url='https://github.com/rockabox/django_warnings',
     license='MIT',
     description='Dynamic warnings with your Django models',
