@@ -2,13 +2,13 @@ from django.test import TestCase
 
 from rest_framework import serializers
 
-from django_warnings.serializers import WarningSerializer
+from django_warnings.serializers import WarningsField
 from ..models import WarningsGeneratingModel
 
 
 class WarningsGeneratingSerializer(serializers.ModelSerializer):
 
-    warnings = WarningSerializer(fields=('id', 'message'))
+    warnings = WarningsField(fields=('id', 'message'))
 
     class Meta:
         model = WarningsGeneratingModel
@@ -48,7 +48,7 @@ class WarningsSerializerTest(TestCase):
         Use a serializer returning the `subject` the Warning object
         """
         class SubjectSerializer(serializers.ModelSerializer):
-            warnings = WarningSerializer(fields=('subject',))
+            warnings = WarningsField(fields=('subject',))
 
             class Meta:
                 model = WarningsGeneratingModel
@@ -72,7 +72,7 @@ class WarningsSerializerTest(TestCase):
                       'last_acknowledged')
 
         class FullSerializer(serializers.ModelSerializer):
-            warnings = WarningSerializer(fields=all_fields)
+            warnings = WarningsField(fields=all_fields)
 
             class Meta:
                 model = WarningsGeneratingModel

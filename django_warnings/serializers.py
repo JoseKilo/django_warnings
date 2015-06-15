@@ -1,28 +1,33 @@
+import ast
+
 from rest_framework import serializers
 
 from .models import Warning
 
 
-class WarningSerializer(serializers.Serializer):
+class WarningsField(serializers.ReadOnlyField):
     """
-    This will be the Serializer normally imported outside the library
+    This will be the Field normally imported outside the library
 
     It uses WarningModelSerializer internally to generate the final response
     """
 
-    def __init__(self, *args, **kwargs):
+    read_only = True
+    required = False
 
-        # Desired fields are kept and will be pass to WarningModelSerializer
+    def __init__(self, *args, **kwargs):
+        # Desired fields are kept and will be passed to WarningModelSerializer
         self.warning_fields = kwargs.pop('fields', [])
 
         # On the `to_native` method, we want to receive the parent object
         # instead of just the `warnings` field
         kwargs['source'] = '*'
-        kwargs['read_only'] = True
 
-        super(WarningSerializer, self).__init__(*args, **kwargs)
+        super(WarningsField, self).__init__(*args, **kwargs)
 
-    def to_native(self, obj):
+    def to_representation(self, obj):
+        super(WarningsField, self).to_representation(obj)
+
         if hasattr(obj, 'generate_warnings'):
             obj.generate_warnings()
 
@@ -56,3 +61,13 @@ class WarningModelSerializer(serializers.ModelSerializer):
 
         for field_name in existing - allowed:
             self.fields.pop(field_name)
+
+    def to_representation(self, obj):
+        """
+        Convert url_params into native data type, as its been stringified
+        """
+        data = super(WarningModelSerializer, self).to_representation(obj)
+        if 'url_params' in data:
+            data['url_params'] = ast.literal_eval(data['url_params'])
+
+        return data

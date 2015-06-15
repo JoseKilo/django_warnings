@@ -16,13 +16,12 @@ class WarningViewSet(ReadOnlyModelViewSet):
             serializer_fields = ('message', 'last_generated')
     """
 
-    model = Warning
+    queryset = Warning.objects.all()
     serializer_class = WarningModelSerializer
     serializer_fields = ('id', 'message', 'identifier', 'url_params')
     http_method_names = ('get', 'post')
 
-    def get_serializer(self, instance=None, data=None, files=None, many=False,
-                       partial=False, allow_add_remove=False):
+    def get_serializer(self, *args, **kwargs):
         """
         Override the dafault method to include the `fields` parameter
 
@@ -31,10 +30,8 @@ class WarningViewSet(ReadOnlyModelViewSet):
         """
         serializer_class = self.get_serializer_class()
         context = self.get_serializer_context()
-        return serializer_class(instance, data=data, files=files,
-                                many=many, partial=partial,
-                                allow_add_remove=allow_add_remove,
-                                context=context, fields=self.serializer_fields)
+        return serializer_class(
+            context=context, fields=self.serializer_fields, *args, **kwargs)
 
     @detail_route(methods=['post'])
     def acknowledge(self, request, pk=None):
