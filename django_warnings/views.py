@@ -16,7 +16,6 @@ class WarningViewSet(ReadOnlyModelViewSet):
             serializer_fields = ('message', 'last_generated')
     """
 
-    model = Warning
     queryset = Warning.objects.all()
     serializer_class = WarningModelSerializer
     serializer_fields = ('id', 'message', 'identifier', 'url_params')
