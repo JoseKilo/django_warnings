@@ -22,10 +22,6 @@ settings.configure(
             'PORT': '',
             'OPTIONS': {'isolation_level': None}
         },
-        'redshift': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': ':memory:',
-        },
     },
     DEBUG=True,
     MIDDLEWARE_CLASSES=[],

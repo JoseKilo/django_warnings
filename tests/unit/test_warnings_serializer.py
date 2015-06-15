@@ -36,7 +36,7 @@ class WarningsSerializerTest(TestCase):
             WarningsGeneratingModel.objects.create()
 
         warning_objects = WarningsGeneratingModel.objects.all()
-        data = WarningsGeneratingSerializer(warning_objects).data
+        data = WarningsGeneratingSerializer(warning_objects, many=True).data
 
         self.assertEqual(len(data), number_of_instances)
         for element in data:

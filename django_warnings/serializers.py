@@ -7,10 +7,13 @@ from .models import Warning
 
 class WarningsField(serializers.ReadOnlyField):
     """
-    This will be the Serializer normally imported outside the library
+    This will be the Field normally imported outside the library
 
     It uses WarningModelSerializer internally to generate the final response
     """
+
+    read_only = True
+    required = False
 
     def __init__(self, *args, **kwargs):
         # Desired fields are kept and will be passed to WarningModelSerializer
@@ -64,6 +67,7 @@ class WarningModelSerializer(serializers.ModelSerializer):
         Convert url_params into native data type, as its been stringified
         """
         data = super(WarningModelSerializer, self).to_representation(obj)
-        data['url_params'] = ast.literal_eval(data['url_params'])
+        if 'url_params' in data:
+            data['url_params'] = ast.literal_eval(data['url_params'])
 
         return data
