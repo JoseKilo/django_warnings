@@ -39,7 +39,7 @@ class WarningViewSet(ReadOnlyModelViewSet):
         Acknowledge a given Warning object. Optional `user_id` can be specified
         """
         warning = self.get_object()
-        user_id = request.DATA.get('user_id')
+        user_id = request.data.get('user_id')
 
         warning.acknowledge(user_id=user_id)
 
