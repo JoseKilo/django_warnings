@@ -22,6 +22,6 @@ setup(
     ],
     install_requires=[
         'Django>=1.7',
-        'django-json-field>=0.5.7'
+        'jsonfield>=1.0.3'
     ],
 )

@@ -1,26 +1,21 @@
-from django.conf.urls import patterns, include, url
 from django.core.urlresolvers import reverse
-from django.test import TestCase
+from django.test import override_settings, TestCase
 
 from rest_framework import status
 
 from django_warnings.models import Warning
+
 from ..models import WarningsGeneratingModel
 
 
+@override_settings(ROOT_URLCONF='django_warnings.urls')
 class WarningsEndpointTest(TestCase):
-
-    urls = patterns(
-        '',
-        url(r'^warnings/',
-            include('django_warnings.urls', namespace='warnings')),
-    )
 
     def test_empty_listing(self):
         """
         The listing endpoint response is valid for an empty set of Warnings
         """
-        url = reverse('warnings:warning-list')
+        url = reverse('warning-list')
 
         response = self.client.get(url)
 
@@ -35,7 +30,7 @@ class WarningsEndpointTest(TestCase):
         for _ in xrange(number_of_objects):
             generating_object = WarningsGeneratingModel.objects.create()
             generating_object.generate_warnings()
-        url = reverse('warnings:warning-list')
+        url = reverse('warning-list')
 
         response = self.client.get(url)
 
@@ -61,7 +56,7 @@ class WarningsEndpointTest(TestCase):
         generating_object = WarningsGeneratingModel.objects.create()
         generating_object.generate_warnings()
         warning_object = Warning.objects.all()[0]
-        url = reverse('warnings:warning-detail', args=(warning_object.id,))
+        url = reverse('warning-detail', args=(warning_object.id,))
 
         response = self.client.get(url)
 
@@ -76,7 +71,7 @@ class WarningsEndpointTest(TestCase):
         generating_object = WarningsGeneratingModel.objects.create()
         generating_object.generate_warnings()
         warning_object = Warning.objects.all()[0]
-        url = reverse('warnings:warning-acknowledge',
+        url = reverse('warning-acknowledge',
                       args=(warning_object.id,))
 
         response = self.client.post(url)
@@ -98,7 +93,7 @@ class WarningsEndpointTest(TestCase):
         generating_object = WarningsGeneratingModel.objects.create()
         generating_object.generate_warnings()
         warning_object = Warning.objects.all()[0]
-        url = reverse('warnings:warning-acknowledge',
+        url = reverse('warning-acknowledge',
                       args=(warning_object.id,))
 
         response = self.client.post(url, data={'user_id': 42})

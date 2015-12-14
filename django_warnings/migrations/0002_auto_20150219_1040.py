@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
-import json_field.fields
+from jsonfield import JSONField
 
 
 class Migration(migrations.Migration):
@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='warning',
             name='url_params',
-            field=json_field.fields.JSONField(default='null', help_text=b'An object with keys that help the frontend form a url', null=True, blank=True),
+            field=JSONField(default='null', help_text=b'An object with keys that help the frontend form a url', null=True, blank=True),
             preserve_default=True,
         ),
     ]
