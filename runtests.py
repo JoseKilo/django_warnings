@@ -27,6 +27,7 @@ settings.configure(
     MIDDLEWARE_CLASSES=[],
     INSTALLED_APPS=(
         'django.contrib.contenttypes',
+        'django.contrib.auth',
 
         'django_warnings',
         'tests'

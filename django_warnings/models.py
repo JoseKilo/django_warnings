@@ -3,7 +3,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils import timezone
 
-from json_field import JSONField
+from jsonfield import JSONField
 
 
 class Warning(models.Model):
